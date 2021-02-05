@@ -46,12 +46,14 @@ io.on('connection', function(socket) {
     const socketQuery = socket.handshake.query;
     console.log('disconnect: ', socketQuery)
   })
-  
+
+  //发送给其他人的消息
   function sendOtherUsersNotification(method, data) {
     console.log('sendOtherUsersNotification method data', method, data);
     socket.broadcast.emit('notification', { method, data });
   }
-  
+
+  //发送给自己的信息
   function sendSelfNotification(method, data) {
     console.log('sendSelfNotification method data', method, data);
     socket.emit('notification', { method, data });
