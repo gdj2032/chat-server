@@ -1,3 +1,6 @@
+/**
+ * 多人房间server
+ * */
 var { SocketType, NotificationType, RequestMethod } = require('./constans')
 var app = require('express')();
 var server = require('http').Server(app);
@@ -8,10 +11,6 @@ var io = require('socket.io')(server, {
 var url = 'http://localhost:9002';
 
 var port = 9002;
-
-var users = {};
-
-var messages = [];
 
 var msgId = 1;
 
@@ -26,6 +25,7 @@ io.on('connection', function(socket) {
 
     socket.join(room);
 
+    //当前房间内的人
     var usersInRoom = io.sockets.adapter.rooms[room];
     console.log('usersInRoom: ', usersInRoom);
 

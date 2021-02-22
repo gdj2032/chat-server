@@ -1,6 +1,8 @@
 var { SocketType, NotificationType, RequestMethod } = require('./constans')
 var app = require('express')();
+//通过http模块Server方法获取关联Express的服务对象
 var server = require('http').Server(app);
+//导入socket.io模块获取io对象并关联http服务对象
 var io = require('socket.io')(server, {
   origins: "*:*"
 });
@@ -29,7 +31,7 @@ io.on('connection', function(socket) {
   sendOtherUsersNotification(NotificationType.newUser, userOpt);
 
   //服务端监听客户端发送的新消息
-  socket.on('request', function({method, data}) {
+  socket.on('request', function({method, data}, cb) {
     const socketQuery = socket.handshake.query;
     if (method === RequestMethod.leave) {
       delete users[socket.id];
