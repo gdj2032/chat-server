@@ -6,7 +6,7 @@ var options = {
     port : 5678
 }
 
-var tcp_client = net.Socket();
+var tcp_client = new net.Socket();
 
 // 连接 tcp server
 tcp_client.connect(options,function(){
