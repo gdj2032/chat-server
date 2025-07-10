@@ -94,7 +94,8 @@ def handle_connect(auth=None):  # 添加 auth 参数
 @socketio.on(ServerMessageEnum.request)
 def handle_request(data):
     global msg_id
-    if data['method'] == RequestEnum.leave:
+    res = SocketIoRes(data['method'], data['data'])
+    if res.method == RequestEnum.leave:
         user_id = request.sid
         if user_id in users:
             user_opt = users[user_id]
@@ -103,13 +104,13 @@ def handle_request(data):
             emit(ServerMessageEnum.notification, userClosedRes.to_dict(), broadcast=True)
             print(f"disconnect: {user_opt}")
         socketio.close_room(user_id)
-    elif data['method'] == RequestEnum.sendMsg:
+    elif res.method == RequestEnum.sendMsg:
         user_id = request.sid
         if user_id not in users:
             print(f"User not found: {user_id}")
             return
         user_name = users[user_id].username
-        opt = Message(user_name, data['data'], msg_id)
+        opt = Message(user_name, res.data, msg_id)
         messages.append(opt)
         msg_id += 1
         newMessageRes = SocketIoRes(NotificationEnum.newMessage, opt)
