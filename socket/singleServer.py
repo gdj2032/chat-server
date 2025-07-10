@@ -83,9 +83,11 @@ def handle_connect(auth=None):  # 添加 auth 参数
         return
     user = User(request.sid, user_name)
     users[user.id] = user
-    newUserRes = SocketIoRes(NotificationEnum.newUser, user)
+    newUserRes = SocketIoRes(NotificationEnum.newUser, user.to_dict())
     emit(ServerMessageEnum.notification, newUserRes.to_dict(), broadcast=True)
-    roomReadyRes = SocketIoRes(NotificationEnum.roomReady, {'messages': messages, 'users': [user.to_dict() for user in users.values()]})
+    users_dict = [user.to_dict() for user in users.values()]
+    messages_dict = [message.to_dict() for message in messages]
+    roomReadyRes = SocketIoRes(NotificationEnum.roomReady, {'messages': messages_dict, 'users': users_dict})
     emit(ServerMessageEnum.notification, roomReadyRes.to_dict(), broadcast=True)
     print(f"start connection: {user}")
 
@@ -98,7 +100,7 @@ def handle_request(data):
         if user_id in users:
             user_opt = users[user_id]
             del users[user_id]
-            userClosedRes = SocketIoRes(NotificationEnum.userClosed, user_opt)
+            userClosedRes = SocketIoRes(NotificationEnum.userClosed, user_opt.to_dict())
             emit(ServerMessageEnum.notification, userClosedRes.to_dict(), broadcast=True)
             print(f"disconnect: {user_opt}")
         socketio.close_room(user_id)
@@ -111,7 +113,7 @@ def handle_request(data):
         opt = Message(user_name, res.data, msg_id)
         messages.append(opt)
         msg_id += 1
-        newMessageRes = SocketIoRes(NotificationEnum.newMessage, opt)
+        newMessageRes = SocketIoRes(NotificationEnum.newMessage, opt.to_dict())
         emit(ServerMessageEnum.notification, newMessageRes.to_dict(), broadcast=True)
         print(f"new message: {opt}")
     else:
@@ -123,7 +125,7 @@ def handle_disconnect():
     if user_id in users:
         user_opt = users[user_id]
         del users[user_id]
-        userClosedRes = SocketIoRes(NotificationEnum.userClosed, user_opt)
+        userClosedRes = SocketIoRes(NotificationEnum.userClosed, user_opt.to_dict())
         emit(ServerMessageEnum.notification, userClosedRes.to_dict(), broadcast=True)
         print(f"disconnect: {user_opt}")
 
